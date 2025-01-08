@@ -7,6 +7,8 @@ import { SharedService } from '../shared/shared.service';
 import { otpCodeSchema } from 'src/models/otp.model';
 import { EmailTemplates } from 'src/helpers/constants';
 import { LoginDto } from 'src/dtos/login.dto';
+import { UpdatePasswordDto } from 'src/dtos/reset-password.dto';
+import { SocialLoginDto } from 'src/dtos/SocialLogin.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,28 +25,20 @@ export class AuthService {
   ): Promise<{ user: UserRegisterSchema; token: string }> {
     try {
       console.log('Registering user:', body.email);
-
-      // Hash the password
       const hashedPassword = await this.sharedService.generatePasswordHash(
         body.password.trim(),
       );
       delete body.password;
-
-      // Check for existing user
       const existingUser = await this.userRegistrationModel.findOneBy({
         email: body.email,
       });
       if (existingUser) {
         throw new BadRequestException('User already registered.');
       }
-
-      // Create user entity
       const user = this.userRegistrationModel.create({
         ...body,
         password: hashedPassword,
       });
-
-      // Generate OTP and save it
       const otpCode = await this.sharedService.generateOtpCode();
       await this.otpModel.save({
         otp: otpCode,
@@ -119,5 +113,71 @@ export class AuthService {
     } catch (error) {
       throw new BadRequestException(error.message || 'Login failed.');
     }
+  }
+
+  // Send OTP
+  async sendOtp(email: string) {
+    const existingUser = await this.userRegistrationModel.findOneBy({ email });
+
+    if (!existingUser) {
+      throw new BadRequestException('Please enter a valid email address');
+    }
+    const otp = await this.sharedService.generateOtpCode();
+    try {
+      await this.sharedService.addEmailToQueue({
+        to: email,
+        subject: 'Confirm your account!',
+        template: EmailTemplates.CONFIRM_EMAIL,
+        context: {
+          appName: process.env.APP_NAME,
+          otp,
+        },
+      });
+
+      await this.otpModel.save({
+        otp,
+        email,
+      });
+      return { message: 'OTP has been sent to your email.' };
+    } catch (error) {
+      console.log('Error while sending the otp code');
+      throw new Error('Failed to send verification email.');
+    }
+  }
+
+  // Reset Password
+  async resetPassword(body: UpdatePasswordDto, user: UserRegisterDto) {
+    try {
+      const hashedPassword = await this.sharedService.generatePasswordHash(
+        body.password,
+      );
+
+      await this.userRegistrationModel.update(user.id, {
+        password: hashedPassword,
+      });
+      body.password = undefined;
+    } catch (error) {
+      throw new Error(error + 'Failed to update user password');
+    }
+  }
+
+  // Social Login
+  async socialLogin(body: SocialLoginDto) {
+    const { name, email, uid, provider } = body;
+    let checkUser = await this.userRegistrationModel.findOne({
+      where: {
+        uid: uid,
+        provider: provider,
+      },
+    });
+    if (!checkUser) {
+      checkUser = await this.userRegistrationModel.save({
+        ...body,
+        isVerified: true,
+      });
+    }
+
+    const token = await this.sharedService.generateToken(checkUser);
+    return { user: checkUser, token };
   }
 }

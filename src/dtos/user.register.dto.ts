@@ -11,6 +11,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Gender, Role } from 'src/helpers/constants';
 
 export class UserRegisterDto {
+  id: number;
   @ApiProperty({
     description: 'Prefix for the user, e.g., Mr, Mrs',
     required: false,
