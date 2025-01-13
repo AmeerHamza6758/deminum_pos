@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { Queue } from 'bull';
+import { Request } from 'express';
 import { QueueNames } from 'src/helpers/constants';
 import { MailInput } from 'src/helpers/interfaces/email.template.interface';
 import { UserRegisterSchema } from 'src/models/user.model';
@@ -68,15 +69,38 @@ export class SharedService {
 
   // Add Email to Queue
   async addEmailToQueue(data: MailInput) {
-    await this.emailQueue.add('sendEmail', data);
+    try {
+      console.log('Email added to queue', data);
+      await this.emailQueue.add('sendEmail', data);
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   //Email service
   async sendEmail(data: MailInput) {
     try {
+      console.log('Email sent to queue', data);
       await this.mailerService.sendMail(data);
     } catch (error) {
       console.log(error.message);
     }
   }
+
+  // Get Base URL
+  generateBaseUrl(request: Request): string {
+    const protocol = request.protocol;
+    const hostname = request.hostname;
+    return `${protocol}://${hostname}`;
+  }
+
+  // Generate Public path for Image
+  generateImagePath(baseUrl: string, path: string) {
+    return baseUrl + '/' + path;
+  }
+}
+
+//Calculate total pages
+export function calculateTotalPages(total: number, limit: number): number {
+  return Math.ceil(total / limit);
 }

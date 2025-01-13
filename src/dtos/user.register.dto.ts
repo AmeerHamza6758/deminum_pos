@@ -8,7 +8,7 @@ import {
   MinLength,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { Gender, Role } from 'src/helpers/constants';
+import { Gender} from 'src/helpers/constants';
 
 export class UserRegisterDto {
   id: number;
@@ -45,17 +45,18 @@ export class UserRegisterDto {
     required: true,
     type: String,
   })
+
   @IsEmail()
   @IsNotEmpty()
   email: string;
 
+  @IsOptional()
   @ApiProperty({
     description: 'Profile image URL of the user',
     required: false,
+    format:'binary',
     type: String,
   })
-  @IsOptional()
-  @IsString()
   profileImage?: string;
 
   @ApiProperty({
@@ -82,7 +83,7 @@ export class UserRegisterDto {
     type: String,
   })
   @IsOptional()
-  @IsDateString()
+  @IsString()
   dob?: string;
 
   @ApiProperty({
@@ -310,15 +311,4 @@ export class UserRegisterDto {
   @IsOptional()
   @IsString()
   bankIdentifierCode?: string;
-
-  // Role with default value of "user"
-  @ApiProperty({
-    description: 'Role of the user (e.g., admin, user, superadmin)',
-    enum: Role,
-    required: false,
-    default: Role.User,
-  })
-  @IsOptional()
-  @IsEnum(Role)
-  roleName: Role = Role.User;
 }

@@ -12,7 +12,7 @@ export const databaseConfig = (): TypeOrmModuleOptions => ({
   autoLoadEntities: true,
   synchronize: false,
   migrationsRun: true,
-  entities: [__dirname + '/../models/*.ts'],
-  // entities: [UserRegisterSchema],
-  // migrations: [__dirname + '/../migrations/*.ts'],
+  entities: [__dirname + '../models/*.ts'],
+  migrations: [__dirname + '../migrations/*.ts'],
 });
+ 

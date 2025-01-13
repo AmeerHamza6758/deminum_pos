@@ -1,155 +1,132 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsEmail,
-  IsNotEmpty,
   IsOptional,
   IsString,
-  MinLength,
+  IsNumber,
+  IsUrl,
+  Matches,
+  Length,
 } from 'class-validator';
 
-export class CreateBusinessDto {
+export class UpdateBusinessDto {
   @ApiProperty({
     description: 'Name of the business',
     type: String,
-    required: true,
+    required: false,
   })
-  bussinessName: string;
+  @IsOptional()
+  @IsString()
+  bussinessName?: string;
 
   @ApiProperty({
     description: 'Start date of the business (ISO 8601 format)',
     type: String,
-    required: true,
+    required: false,
   })
-  startDate: string;
+  @IsOptional()
+  @IsString()
+  startDate?: string;
 
   @ApiProperty({
     description: 'Currency used by the business',
     type: String,
-    required: true,
+    required: false,
   })
-  currency: string;
+  @IsOptional()
+  @IsString()
+  currency?: string;
 
   @ApiProperty({
     description: 'URL of the business logo',
     type: String,
-    required: true,
+    required: false,
   })
-  logo: string;
+  @IsOptional()
+  @IsUrl()
+  logo?: string;
 
   @ApiProperty({
     description: 'Website of the business',
     type: String,
     required: false,
   })
-  website: string;
+  @IsOptional()
+  @IsUrl()
+  website?: string;
 
   @ApiProperty({
     description: 'Primary contact number of the business',
     type: String,
-    required: true,
+    required: false,
   })
-  bussinessContactNumber: string;
+  @IsOptional()
+  @IsString()
+  @Matches(/^[0-9]+$/)
+  @Length(10, 15)
+  bussinessContactNumber?: string;
 
   @ApiProperty({
     description: 'Alternative contact number of the business',
     type: String,
     required: false,
   })
-  alterContactNumber: string;
+  @IsOptional()
+  @IsString()
+  @Matches(/^[0-9]+$/)
+  @Length(10, 15)
+  alterContactNumber?: string;
 
   @ApiProperty({
     description: 'Country where the business is located',
     type: String,
-    required: true,
+    required: false,
   })
-  country: string;
+  @IsOptional()
+  @IsString()
+  country?: string;
 
   @ApiProperty({
     description: 'State where the business is located',
     type: String,
-    required: true,
+    required: false,
   })
-  state: string;
+  @IsOptional()
+  @IsString()
+  state?: string;
 
   @ApiProperty({
     description: 'City where the business is located',
     type: String,
-    required: true,
+    required: false,
   })
-  city: string;
+  @IsOptional()
+  @IsString()
+  city?: string;
 
   @ApiProperty({
     description: 'Zip code of the business location',
     type: Number,
-    required: true,
+    required: false,
   })
-  zipCode: number;
+  @IsOptional()
+  @IsNumber()
+  zipCode?: number;
 
   @ApiProperty({
     description: 'Landmark near the business location',
     type: String,
     required: false,
   })
-  landMark: string;
+  @IsOptional()
+  @IsString()
+  landMark?: string;
 
   @ApiProperty({
     description: 'Timezone of the business location',
     type: String,
-    required: true,
-  })
-  timeZone: string;
-
-  @ApiProperty({
-    description: 'Prefix for the user, e.g., Mr, Mrs',
     required: false,
-    type: String,
   })
   @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  prefix?: string;
-
-  @ApiProperty({
-    description: 'First name of the user',
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @IsNotEmpty()
-  fname: string;
-
-  @ApiProperty({
-    description: 'Last name of the user',
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @IsNotEmpty()
-  lname: string;
-
-  @ApiProperty({
-    description: 'User email address',
-    required: true,
-    type: String,
-  })
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
-
-  @ApiProperty({
-    description: 'User password for authentication',
-    required: true,
-    type: String,
-  })
-  @IsString()
-  @MinLength(6)
-  password: string;
-
-  @ApiProperty({
-    description: 'userName',
-    required: true,
-    type: String,
-  })
-  @IsString()
-  username: string;
+  timeZone?: string;
 }

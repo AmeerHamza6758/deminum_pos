@@ -9,6 +9,7 @@ import { EmailTemplates } from 'src/helpers/constants';
 import { LoginDto } from 'src/dtos/login.dto';
 import { UpdatePasswordDto } from 'src/dtos/reset-password.dto';
 import { SocialLoginDto } from 'src/dtos/SocialLogin.dto';
+import { clear } from 'console';
 
 @Injectable()
 export class AuthService {
@@ -39,12 +40,15 @@ export class AuthService {
         ...body,
         password: hashedPassword,
       });
+      console.log('Created user');
       const otpCode = await this.sharedService.generateOtpCode();
       await this.otpModel.save({
         otp: otpCode,
         email: user.email,
       });
+      console.log(otpCode, 'Created OTP');
       const token = await this.sharedService.generateToken(user);
+      console.log(token, 'Created token');
       await this.sharedService.addEmailToQueue({
         to: user.email,
         subject: 'Confirm your account!',
@@ -54,6 +58,7 @@ export class AuthService {
           otpCode,
         },
       });
+      console.log('User Saved Success');
       const savedUser = await this.userRegistrationModel.save(user);
 
       return {
@@ -116,9 +121,11 @@ export class AuthService {
   }
 
   // Send OTP
-  async sendOtp(email: string) {
-    const existingUser = await this.userRegistrationModel.findOneBy({ email });
-
+  async sendOtp(email: string){
+    const existingUser = await this.userRegistrationModel.findBy({
+      email: email,
+    });
+    console.log(existingUser, 'This is Existing User');
     if (!existingUser) {
       throw new BadRequestException('Please enter a valid email address');
     }

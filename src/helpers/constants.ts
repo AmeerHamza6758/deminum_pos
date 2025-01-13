@@ -11,7 +11,7 @@ export enum Role {
 }
 
 export const QueueNames = {
-  EMAIL_QUEUE: 'email=queue',
+  EMAIL_QUEUE: 'email-queue',
 
   NOTIFICATIONS_QUEUE: 'notifications-queue',
 };

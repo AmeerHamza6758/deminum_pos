@@ -9,7 +9,8 @@ import {
   IsBoolean,
 } from 'class-validator';
 import { Gender, Role } from 'src/helpers/constants';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { BusinessRegisterSchema } from './bussiness.model';
 
 @Entity('user_register')
 export class UserRegisterSchema {
@@ -34,6 +35,11 @@ export class UserRegisterSchema {
   @Column({ nullable: false })
   lname: string;
 
+  @IsString()
+  @IsNotEmpty()
+  @Column({ nullable: true })
+  username: string;
+
   @IsEmail()
   @IsNotEmpty()
   @Column({ unique: true, nullable: false })
@@ -41,7 +47,7 @@ export class UserRegisterSchema {
 
   @IsOptional()
   @IsString()
-  @Column({ nullable: true })
+  @Column({ nullable: true, default: '' })
   profileImage: string;
 
   @IsString()
@@ -55,9 +61,7 @@ export class UserRegisterSchema {
   @Column({ nullable: true })
   language: string;
 
-  @IsDateString()
   @IsOptional()
-  @IsNotEmpty()
   @Column({ nullable: true })
   dob: string;
 
@@ -208,12 +212,12 @@ export class UserRegisterSchema {
   bankIdentifierCode: string;
 
   @IsOptional()
-  @IsEnum(Role)
+  // @IsEnum(Role)
   @Column({
-    default: Role.User,
-    nullable: false,
+    default: 'user',
+    nullable: true,
   })
-  roleName: Role;
+  roleName: string;
 
   // social login
   @IsOptional()
@@ -234,4 +238,8 @@ export class UserRegisterSchema {
   @IsBoolean()
   @Column({ default: false, nullable: true })
   isVerified: boolean;
+
+  // Relations
+  @OneToMany(() => BusinessRegisterSchema, (business) => business.user)
+  businesses: BusinessRegisterSchema[];
 }

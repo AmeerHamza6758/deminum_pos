@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import {
   IsNotEmpty,
   IsString,
@@ -9,6 +9,7 @@ import {
   Matches,
   Length,
 } from 'class-validator';
+import { UserRegisterSchema } from './user.model';
 
 @Entity()
 export class BusinessRegisterSchema {
@@ -81,4 +82,17 @@ export class BusinessRegisterSchema {
   @IsNotEmpty()
   @IsString()
   timeZone: string;
+
+  @ManyToOne(() => UserRegisterSchema, (user) => user.businesses, { cascade: true })
+  @JoinColumn({ name: 'userId' }) 
+  user: UserRegisterSchema;
+
+  @Column({ nullable: false })
+  userId: number;
+
+  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  updatedAt: Date;
 }
